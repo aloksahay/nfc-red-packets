@@ -1,46 +1,29 @@
 import Foundation
 
 enum Configuration {
-    enum Error: Swift.Error {
-        case missingKey, invalidValue
-    }
-
-    static func value<T>(for key: String) throws -> T where T: LosslessStringConvertible {
-        guard let object = Bundle.main.object(forInfoDictionaryKey: key) else {
-            throw Error.missingKey
+    private static let configDict: [String: Any] = {
+        guard let path = Bundle.main.path(forResource: "Config", ofType: "plist"),
+              let dict = NSDictionary(contentsOfFile: path) as? [String: Any] else {
+            print("Failed to load Config.plist")
+            return [:]
         }
-
-        switch object {
-        case let value as T:
-            return value
-        case let string as String:
-            guard let value = T(string) else { fallthrough }
-            return value
-        default:
-            throw Error.invalidValue
-        }
-    }
-}
-
-enum API {
-    static var baseURL: String {
-        #if DEBUG
+        return dict
+    }()
+    
+static var baseURL: String {
         return "http://localhost:3000"
-        #else
-        return "https://your-production-url.com"
-        #endif
     }
-    
+
     static var web3AuthClientId: String {
-        return try! Configuration.value(for: "WEB3_AUTH_CLIENT_ID")
-    }
-    
-    static var web3RedirectURL: String {
-        return try! Configuration.value(for: "APP_REDIRECT_URL")
+        return configDict["WEB3_AUTH_CLIENT_ID"] as? String ?? ""
     }
     
     static var infuraKey: String {
-        return try! Configuration.value(for: "INFURA_KEY")
+        return configDict["INFURA_KEY"] as? String ?? ""
     }
-
+    
+    static var appRedirectUrl: String {
+        return configDict["APP_REDIRECT_URL"] as? String ?? ""
+    }
 }
+
