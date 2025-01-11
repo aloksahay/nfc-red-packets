@@ -10,7 +10,6 @@ yarn-error.log
 
 # Xcode
 xcuserdata/
-*.xcworkspace/
 DerivedData/
 build/
 *.pbxuser
